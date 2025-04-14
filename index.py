@@ -1,6 +1,8 @@
 import random
 import time
 import os
+from colorama import Fore, Back, Style
+
 
 temp = '🐴🐴🐵🐵🐟🐟🐸🐸🐩🐩🦊🦊🐣🐣🐼🐼'
 figuras = list(temp)
@@ -8,6 +10,8 @@ figuras = list(temp)
 print("="*40)
 print(" "*10 + "JOGO DA MEMORIA" + " "*10)
 print("="*40)
+
+jogador = input("Digite seu nome para jogar: ")
 
 jogo = []
 apostas = []
@@ -96,20 +100,72 @@ while True:
     if apostas[x1][y1] == apostas[x2][y2]:
         print("Parabéns! Você acertou! ")
         contador = verificaTabuleiro()
+        totalPontos =+ 10
         if contador == 0:
             print("Parabéns você venceu!!!🏆🏆🏆")
+            
             break
         else:
             print(f"Faltam {contador/2} bichos para descobrir")
     else:
         print("Errou... tente novamente.")
         time.sleep(2)
+        totalPontos =- 5
         apostas[x1][y1] = "♦️"
         apostas[x2][y2] = "♦️"
         sair = input("Deseja sair (S/N): ").upper()
         if sair == "S":
             break
         
+print("="*40)
+print(" "*10 + f"Jogador: {jogador}" + " "*10)
+print(" "*10 + f"Total de pontos: {totalPontos}" + " "*10)
+print(" "*10 + f"Tempo de jogo: {tempo}" + " "*10)
+print("="*40)
+
+
+# Salvamento de dados
+dados = []
+if os.path.isfile("ranking.txt"):
+    with open("ranking.txt", "r") as arq:
+        dados = arq.readlines()
+        
+dados.append(f"{jogador};{totalPontos};\n")
+
+with open("ranking.txt", "w") as arq:
+    for dado in dados:
+        arq.write(dado)
+        
+# Rotina para classificar  
+nomes = []
+pontos = []
+tempo = []
+
+for dado in dados:
+    partes = dado.split(";")
+    nomes.append(partes[0])
+    pontos.append(int(partes[1]))
+    tempos.append(int(partes[2])*-1)
+    
+    
+# Coloca as 3 listas em ordem (zipando as 3 linhas)
+juntas = sorted(zip(pontos, tempos, nomes), reverse=True)
+# Volta a separar as listas (faz um "unzip")
+pontos2, tempos2, nomes2 = zip(*juntas)
+
+print()
+print("="*43)
+print("-----------< RANKING DOS JOGADORES: >------------")
+print("="*43)
+print("N° Nome do jogador.......: Pontos Tempo.:")
+
+for num, (nome, ponto, tempo) in enumerate(zip(nomes2, pontos2, tempos2)):
+    if nome == jogador and ponto == totalPontos:
+        print(Fore.RED + f"{num:2d} {nome:25s}   {ponto:2d}   {tempo:3d}seg", end="")
+        print(Style.RESET_ALL)
+    else: 
+        print(f"{num:2d} {nome:25s}   {ponto:2d}   {tempo:3d}seg", end="")
+    
         
         
 # -----------------EXERCÍCIO--------------------------
